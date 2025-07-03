@@ -1,0 +1,71 @@
+version: '3.8'
+services:
+  postgres_db:
+    image: postgres:13-alpine
+    container_name: helpdesk_postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: helpdesk_db
+    networks:
+      - helpdesk_network
+
+  redis_cache:
+    image: redis:6-alpine
+    container_name: helpdesk_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - helpdesk_network
+
+  # backend:
+  #   build:
+  #     context: ./backend
+  #     dockerfile: Dockerfile # You'll need to create this
+  #   container_name: helpdesk_backend
+  #   ports:
+  #     - "5000:5000" # Expose backend port
+  #   depends_on:
+  #     - postgres_db
+  #     - redis_cache
+  #   environment:
+  #     NODE_ENV: development
+  #     DATABASE_URL: postgresql://admin:password123@postgres_db:5432/helpdesk_db
+  #     REDIS_URL: redis://redis_cache:6379
+  #     JWT_SECRET: yourjwtsecretfordocker
+  #   volumes:
+  #     - ./backend/src:/app/src # Mount src for hot-reloading if configured
+  #   networks:
+  #     - helpdesk_network
+
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile # You'll need to create this
+  #   container_name: helpdesk_frontend
+  #   ports:
+  #     - "3000:3000" # Expose frontend dev server port
+  #   depends_on:
+  #     - backend # If frontend needs backend during build or for proxy
+  #   environment:
+  #     # For Vite, ensure your app uses these, e.g. import.meta.env.VITE_API_BASE_URL
+  #     VITE_API_BASE_URL: http://localhost:5000/api/v1 # Or http://backend:5000/api/v1 if using service name
+  #   volumes:
+  #     - ./frontend/src:/app/src # Mount src for hot-reloading
+  #     - ./frontend/public:/app/public
+  #   networks:
+  #     - helpdesk_network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  helpdesk_network:
+    driver: bridge
