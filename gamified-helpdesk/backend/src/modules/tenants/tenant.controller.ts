@@ -1,0 +1,1 @@
+// Tenant controller (placeholder)

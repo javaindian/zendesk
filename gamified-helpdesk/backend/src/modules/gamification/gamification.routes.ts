@@ -1,0 +1,1 @@
+// Gamification routes (placeholder)
